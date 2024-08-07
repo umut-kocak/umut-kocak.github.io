@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Umut Kocak</title>
+  <meta name="description" content="My personal website" />
+  <meta name="keywords" content="virtual reality, augmented reality, computer graphics, machine learning, ai" />
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script type="text/javascript" src="js/modernizr-1.5.min.js"></script>
+  <script type="text/javascript" src="js/jquery.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      $("#common_header").load("common_header.html"); 
+      $("#common_footer").load("common_footer.html"); 
+      $("#common_images").load("common_images.html"); 
+      $("#common_sidebar").load("common_sidebar.html"); 
+    });
+  </script> 
+</head>
+
+<body>
+
+  <div id="main">
+    <div id="common_header"></div>
+    <nav>
+      <ul class="sf-menu" id="nav">
+        <li class="selected"><a href="index.html">Home</a></li>
+        <li><a href="education.html">Education</a></li>
+        <li><a href="publications.html">Publications</a></li>
+        <li><a href="work.html">Work</a></li>
+        <li><a href="expertise_skills.html">Expertise &amp Skills</a></li>
+        <li><a href="projects.html">Projects</a>
+          <ul>
+            <li><a href="projects_graphics.html">Graphics</a></li>
+            <li><a href="projects_vision.html">Vision</a></li>
+            <li><a href="projects_ai.html">AI</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+    
+    <div id="site_content">
+      <div id="common_images"></div>
+      <div id="common_sidebar"></div>
+
+      <div class="content">
+
+        <h1>About Me</h1>
+        <p>My name is Umut Kocak, and I am a seasoned professional in computer graphics and computer vision, with a career spanning back to 2004.
+        My journey from image processing to computer graphics has exposed me to a wide range of projects, including volume rendering, haptic rendering,
+        physics simulation, real-time rendering, photogrammetry, 3D reconstruction, computer vision, deep learning, and ray tracing.
+        I find joy in understanding the intricate relationships between mathematical models and real-world phenomena, especially those involving visual imagination.
+        I have mostly worked on demanding real-time interactive projects, and as a result, I have developed expertise in GPU programming, code optimization,
+        and memory monitoring. I enjoy seeing not only the big picture but also paying attention to details, as the saying goes: "The devil is in the details."
+		</p>
+		<p>
+        Apart from technical challenges, I have occasionally taken on diverse roles, including teaching, mentorship, project management, Scrum Master, and team lead.
+        I enjoy socializing in person with colleagues and sharing silly jokes.
+		</p>
+		<p>
+        I prefer to spend my free time actively outdoors. In the past, I’ve enjoyed snowboarding, playing tennis, and running, but lately, my knees have been
+        telling me to find other hobbies. Therefore, I have been focusing on more sustainable activities like freestyle swimming and sailing. My lifelong passion
+        also includes partner dances such as salsa, bachata, and zouk.
+		</p>
+		<p>
+        After living in different countries, I eventually settled in Berlin, where I started my own family and discovered my latest passion—spending time outdoors with my son.&#128151;
+		</p>
+
+      </div>
+
+    </div>
+    <div id="common_footer"></div>
+  </div>
+
+  <p>&nbsp;</p>
+  <!-- javascript at the bottom for fast page loading -->
+  <script type="text/javascript" src="js/jquery.easing-sooper.js"></script>
+  <script type="text/javascript" src="js/jquery.sooperfish.js"></script>
+  <script type="text/javascript" src="js/image_fade.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('ul.sf-menu').sooperfish();
+    });
+  </script>
+
+</body>  
+
+</html>

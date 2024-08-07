@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Umut Kocak</title>
+  <meta name="description" content="My personal website" />
+  <meta name="keywords" content="virtual reality, augmented reality, computer graphics, machine learning, ai" />
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script type="text/javascript" src="js/modernizr-1.5.min.js"></script>
+  <script type="text/javascript" src="js/jquery.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      $("#common_header").load("common_header.html"); 
+      $("#common_footer").load("common_footer.html"); 
+      $("#common_images").load("common_images.html"); 
+      $("#common_sidebar").load("common_sidebar.html"); 
+    });
+  </script> 
+</head>
+
+<body>
+
+  <div id="main">
+    <div id="common_header"></div>
+    <nav>
+      <ul class="sf-menu" id="nav">
+        <li><a href="index.html">Home</a></li>
+        <li class="selected"><a href="education.html">Education</a></li>
+        <li><a href="publications.html">Publications</a></li>
+        <li><a href="work.html">Work</a></li>
+        <li><a href="expertise_skills.html">Expertise &amp Skills</a></li>
+        <li><a href="projects.html">Projects</a>
+          <ul>
+            <li><a href="projects_graphics.html">Graphics</a></li>
+            <li><a href="projects_vision.html">Vision</a></li>
+            <li><a href="projects_ai.html">AI</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+    
+    <div id="site_content">
+      <div id="common_images"></div>
+      <div id="common_sidebar"></div>
+
+      <div class="content">
+
+        <h2>Doctor of Philosophy in Science and Technology</h2>
+        <p>
+        <a href="https://liu.se/en">Linkoping University</a>, SWEDEN 2008 - 2013<br>
+        <a href="https://liu.diva-portal.org/smash/record.jsf?pid=diva2%3A622593&dswid=5312">Thesis:Haptic Interaction with Deformable Objects</a><br>
+        <strong>Relevant Courses:</strong> GPGPU Programming, Nonlinear Optimization, Software Design Patterns
+        </p>
+
+        <h2>Master of Science in Medical Informatics</h2>
+        <p>
+        <a href="https://www.metu.edu.tr/">Middle East technical University</a>, TURKEY 2004 - 2007<br>
+        <a href="https://a.co/d/75Fdnr8">Thesis:Haptic Device Integrated Dental Education Simulation: A Case Study</a><br>
+        <strong>Relevant Courses:</strong> Image Processing, Data Mining
+        </p>
+
+        <h2>Bachelor in Electric, Electronic Engineering</h2>
+        <p>
+        <a href="https://www.metu.edu.tr/">Middle East technical University</a>, TURKEY 1999 - 2004<br>
+        <strong>Relevant Courses:</strong> Computer Graphics, Algorithms and Structures, Object Oriented Programming, C++
+        </p>
+
+      </div>
+
+    </div>
+    <div id="common_footer"></div>
+  </div>
+
+  <p>&nbsp;</p>
+  <!-- javascript at the bottom for fast page loading -->
+  <script type="text/javascript" src="js/jquery.easing-sooper.js"></script>
+  <script type="text/javascript" src="js/jquery.sooperfish.js"></script>
+  <script type="text/javascript" src="js/image_fade.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('ul.sf-menu').sooperfish();
+    });
+  </script>
+
+</body>  
+
+</html>

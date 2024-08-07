@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Umut Kocak</title>
+  <meta name="description" content="My personal website" />
+  <meta name="keywords" content="virtual reality, augmented reality, computer graphics, machine learning, ai" />
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script type="text/javascript" src="js/modernizr-1.5.min.js"></script>
+  <script type="text/javascript" src="js/jquery.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      $("#common_header").load("common_header.html"); 
+      $("#common_footer").load("common_footer.html"); 
+      $("#common_images").load("common_images.html"); 
+      $("#common_sidebar").load("common_sidebar.html"); 
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const absButtons = document.querySelectorAll('.btn-show-abstract');
+
+      absButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const publication = this.closest('.publication');
+          const abstract = publication.querySelector('.abstract');
+
+          // Toggle the display of the abstract
+          if (abstract.style.display === 'none' || abstract.style.display === '') {
+            abstract.style.display = 'block';
+          } else {
+            abstract.style.display = 'none';
+          }
+        });
+      });
+    });
+  </script>
+
+</head>
+
+<body>
+
+  <div id="main">
+    <div id="common_header"></div>
+    <nav>
+      <ul class="sf-menu" id="nav">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="education.html">Education</a></li>
+        <li class="selected"><a href="publications.html">Publications</a></li>
+        <li><a href="work.html">Work</a></li>
+        <li><a href="expertise_skills.html">Expertise &amp Skills</a></li>
+        <li><a href="projects.html">Projects</a>
+          <ul>
+            <li><a href="projects_graphics.html">Graphics</a></li>
+            <li><a href="projects_vision.html">Vision</a></li>
+            <li><a href="projects_ai.html">AI</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+    
+    <div id="site_content">
+      <div id="common_images"></div>
+      <div id="common_sidebar"></div>
+
+      <div class="content">
+
+        <h2>Selected Publications</h2>
+
+        <div class="publication">
+          U. Kocak, K. L. Palmerius, and M. Cooper, “Anisotropic virtual coupling with energy-based deflection for palpating inhomogeneous compliant objects,” in <em>WorldHaptics 2013</em>, pp. 115–120, April 2013.
+          <div class="buttons">
+            <button class="btn-show-abstract">ABS</button>
+          </div>
+          <p class="abstract" style="display: none;">Virtual coupling, a spring-damper system between the haptic probe and its virtual representation, the proxy, is one of the most common approaches for haptic rendering. We have extended the virtual coupling by updating the spring stiffness, sometimes used to simulate compliance of a material, depending on the direction between the proxy and the probe. This anisotropic variation of the stiffness is used in exploring inhomogeneities beneath the surface allowing detection of rigid structures even when they are obscured by another structure beneath the surface. In addition, we also compensate for the energy variation of the spring to maintain passivity and increase realism. User studies were performed to survey the success rate in the detection of obscured rigid bodies beneath the surface with the modified virtual coupling algorithm and the improvement of shape perception for sub-surface objects with the additional energy compensation term providing gradient information. We also discuss potential benefits of the proposed methods as basic extensions to well-known haptic rendering algorithms which are both simpler and yield improved performance over traditional deformation simulation techniques.</p>
+        </div>
+
+        <div class="publication">
+          U. Kocak, K. L. Palmerius, C. Forsell, and M. Cooper, “The effect of the stiffness gradient on the just noticeable difference between surface regions,” in <em>EuroHaptics 2012</em>, pp. 282–292, June 2012.
+          <div class="buttons">
+            <button class="btn-show-abstract">ABS</button>
+            <a class="btn-pdf" href="https://www.diva-portal.org/smash/get/diva2:544548/FULLTEXT01.pdf" target="_blank">PDF</a>
+          </div>
+          <p class="abstract" style="display: none;">Numerous studies have considered the ability of humans to perceive differences in forces and how this affects our ability to interpret the properties of materials. Previous research has not considered the effect of the rate of change of the material stiffness in our ability to perceive differences, however, an important factor in exploration processes such as a doctor’s palpation of the skin to examine tissues beneath. These effects are the topic of this research which attempts to quantify the effects of stiffness gradient magnitude and form on the discernment of changes in stiffness.</p>
+        </div>
+
+        <div class="publication">
+          U. Kocak, K. L. Palmerius, and M. Cooper, “An error analysis model for adaptive deformation simulation,” in <em>Proceedings of ACHI Conference</em>, pp. 192–199, 2012.
+          <div class="buttons">
+            <button class="btn-show-abstract">ABS</button>
+            <a class="btn-pdf" href="https://www.diva-portal.org/smash/get/diva2:544545/FULLTEXT01.pdf" target="_blank">PDF</a>
+          </div>
+          <p class="abstract" style="display: none;">With the widespread use of deformation simulations in medical applications, the realism of the force feedback has become an important issue. In order to reach real-time performance with sufficient realism the approach of adaptivity, solution of different parts of the system with different resolutions and refresh rates, has been commonly deployed. The change in accuracy resulting from the use of adaptivity, however, has been been paid scant attention in the deformation simulation field. Presentation of error metrics is rare, while more focus is given to the real-time stability. We propose an abstract pipeline to perform error analysis for different types of deformation techniques which can consider different simulation parameters. A case study is also performed using the pipeline, and the various uses of the error estimation are discussed.</p>
+        </div>
+
+        <div class="publication">
+          U. Kocak, K. L. Palmerius, C. Forsell, A. Ynnerman, and M. Cooper, “Analysis of the jnd of stiffness in three modes of comparison,” in <em>Proceedings of HAID Conference</em>, pp. 22–31, 2011.
+          <div class="buttons">
+            <button class="btn-show-abstract">ABS</button>
+            <a class="btn-pdf" href="https://www.diva-portal.org/smash/get/diva2:544542/FULLTEXT01.pdf" target="_blank">PDF</a>
+          </div>
+          <p class="abstract" style="display: none;">Understanding and explaining perception of touch is a non-trivial task. Even seemingly trivial differences in exploration may potentially have a significant impact on perception and levels of discrimination. In this study, we explore different aspects of contact related to stiffness perception and their effects on the just noticeable difference (JND) of stiffness are surveyed. An experiment has been performed on non-deformable, compliant objects in a virtual environment with three different types of contact: Discontinuous pressure, continuous pressure and continuous lateral motion. The result shows a significantly better discrimination performance in the case of continuous pressure (a special case of nonlinearity), which can be explained by the concept of haptic memory. Moreover, it is found that the perception is worse for the changes that occur along the lateral axis than the normal axis.</p>
+        </div>
+
+        <div class="publication">
+          U. Kocak, K. L. Palmerius, and M. Cooper, “Dynamic deformation using adaptable, linked asynchronous fem regions,” in <em>Proceedings of the Spring Conference on Computer Graphics</em>, pp. 213–220, April 2009.
+          <div class="buttons">
+            <button class="btn-show-abstract">ABS</button>
+            <a class="btn-pdf" href="https://www.diva-portal.org/smash/get/diva2:214148/FULLTEXT02" target="_blank">PDF</a>
+          </div>
+          <p class="abstract" style="display: none;">In order to simulate both physically and visually realistic soft tissue deformations, the Finite Element Method (FEM) is the most popular choice in the literature. However it is non-trivial to model complex behaviour of soft tissue with sufficient refresh rates, especially for haptic force feedback which requires an update rate of the order of 1 kHz. In this study the use of asynchronous regions is proposed to speed up the solution of FEM equations in real-time. In this way it is possible to solve the local neighborhood of the contact with high refresh rates, while evaluating the more distant regions at lower frequencies, saving computational power to model complex behaviour within the contact area. Solution of the different regions using different methods is also possible. To attain maximum efficiency the size of the regions can be changed, in real-time, in response to the size of the deformation.</p>
+        </div>
+
+        <div class="publication">
+          V. Kilic, U. Kocak, E. I. Konukseven, and E. Mumcuoglu, “Gpu supported haptic device integrated dental simulation environment,” in <em>EuroHaptics 2006</em>, pp. 135–140, July 2006.
+          <div class="buttons">
+            <button class="btn-show-abstract">ABS</button>
+            <a class="btn-pdf" href="https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=db1352631565e0acff9b678aeeeaaf7a64d358af" target="_blank">PDF</a>
+          </div>
+          <p class="abstract" style="display: none;">This study aims to construct a haptic device integrated virtual reality environment for simulating dental treatment operations. In this environment, it is aimed to combine GPU based graphical rendering and haptic rendering. By implementing graphical rendering on GPU, the quality and speed performance of the graphical rendering are enhanced and more CPU resource is dedicated to haptic rendering. However in order to compare the performances of the techniques, volume rendering and iso-surface rendering techniques are implemented on both CPU and GPU. A data pre-processing method is introduced for reducing the computational load. In order to display multiple volumetric objects using the ray casting method, per pixel depth buffer modification is implemented. A haptic rendering method depends on density gradient vectors is also proposed for interacting with volumetric data.</p>
+        </div>
+
+        <div class="publication">
+          E. U. Mumcuoglu, F. Nar, Y. Yardimci, U. Kocak, E. L. Ergun, B. V. Salanc, O. Ugur, and B. Erbas, “Simultaneous surface registration of ictal and interictal spect and magnetic resonance images for epilepsy studies,” <em>Nuclear Medicine Communications</em>, vol. 27, no. 1, pp. 45–55, 2006.
+          <div class="buttons">
+            <button class="btn-show-abstract">ABS</button>
+            <a class="btn-pdf" href="https://www.researchgate.net/publication/7428673_Simultaneous_surface_registration_of_ictal_and_interictal_SPECT_and_magnetic_resonance_images_for_epilepsy_studies" target="_blank">PDF</a>
+          </div>
+          <p class="abstract" style="display: none;">Subtraction of ictal and interictal single photon emission computed tomography (SPECT) images is known to be successful in localizing the seizure focus in the pre-surgical evaluation of patients with partial epilepsy. A computer-aided methods for producing subtraction ictal SPECT co-registered to the magnetic resonance image (MRI) (the SISCOM method) is commonly used. The two registrations involved in SISCOM are (1) between the ictal-interictal SPECT images, which was shown to be the more critical, and (2) between the ictal image and MRI. To improve the accuracy of ictal-interictal registration in SISCOM by registering all three images (ictal, interictal SPECT, MRI) simultaneously. The registration problem is formulated as the minimization of a cost function between three surfaces. Then, to achieve a global minimum of this cost function, the Powell algorithm with randomly distributed initial configurations is used. This technique is tested by a realistic simulation study, a phantom study and a patient study. The results of the simulation study demonstrate that, in surface-based registration, the triple-registration method results in a smaller ictal-interictal SPECT registration error than the pair-wise registration method (P &lt 0.05) for a range of values of the cost-function parameter. However, the improved registration error is still larger than that obtained by the normalized mutual information method (P &lt 0.001), which is a voxel-based registration algorithm. The phantom and patient studies reveal no observable difference between registration results. Although the improved accuracy of triple registration is slightly worse than voxel-based registration, it will soon be possible to apply the results of this study in research utilizing the triple-registration principle to improving voxel-based results of ictal-interictal registration.</p>
+        </div>
+
+
+        <h2>Books</h2>
+
+        <div class="publication">
+          <a href="https://a.co/d/75Fdnr8">Haptic Device Integrated Dental Education Simulation: A Case Study</a>
+          <div class="buttons">
+            <button class="btn-show-abstract">ABS</button>
+          </div>
+          <p class="abstract" style="display: none;">Virtual Reality (VR) applications in medicine hadsignificant improvements. 3D visualization of variousanatomical parts using advanced medical scannerimages, anatomy education, surgery operationsimulation, virtual simulator for laparoscopicskills, virtual endoscopy, psychotherapy andrehabilitation techniques are some of the VRapplications in medicine. Integration of the hapticdevices into VR applications increased the quality ofthe systems. By using haptic devices, the user cannot only feed information to the computer but canreceive information from the computer in the form ofa felt sensation on some part of the body. In thisstudy a method to develop a dental educationsimulator supported by haptic feedback is describedand the evaluation studies held with dentists arepresented.</p>
+        </div>
+
+        
+      </div>
+
+    </div>
+    <div id="common_footer"></div>
+  </div>
+
+  <p>&nbsp;</p>
+  <!-- javascript at the bottom for fast page loading -->
+  <script type="text/javascript" src="js/jquery.easing-sooper.js"></script>
+  <script type="text/javascript" src="js/jquery.sooperfish.js"></script>
+  <script type="text/javascript" src="js/image_fade.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('ul.sf-menu').sooperfish();
+    });
+  </script>
+
+</body>  
+
+</html>

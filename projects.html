@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Umut Kocak</title>
+  <meta name="description" content="My personal website" />
+  <meta name="keywords" content="virtual reality, augmented reality, computer graphics, machine learning, ai" />
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script type="text/javascript" src="js/modernizr-1.5.min.js"></script>
+  <script type="text/javascript" src="js/jquery.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      $("#common_header").load("common_header.html"); 
+      $("#common_footer").load("common_footer.html"); 
+      $("#common_images").load("common_images.html"); 
+      $("#common_sidebar").load("common_sidebar.html"); 
+    });
+  </script> 
+</head>
+
+<body>
+
+  <div id="main">
+    <div id="common_header"></div>
+    <nav>
+      <ul class="sf-menu" id="nav">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="education.html">Education</a></li>
+        <li><a href="publications.html">Publications</a></li>
+        <li><a href="work.html">Work</a></li>
+        <li><a href="expertise_skills.html">Expertise &amp Skills</a></li>
+        <li><a href="projects.html">Projects</a>
+          <ul>
+            <li><a href="projects_graphics.html">Graphics</a></li>
+            <li><a href="projects_vision.html">Vision</a></li>
+            <li><a href="projects_ai.html">AI</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+    
+    <div id="site_content">
+      <div id="common_images"></div>
+      <div id="common_sidebar"></div>
+
+      <div class="content">
+
+        <div class="aligned-images">
+
+          <span class="left">
+          <a href="projects_graphics.html">
+          <img style="width:200px;height:125px;" src="assets/images/under_construction.jpg" alt="missing_graphic_projects" title="graphics" />
+          </a>
+          </span>
+
+          <span class="center">
+          <a href="projects_vision.html">
+          <img style="width:200px;height:125px;" src="assets/images/under_construction.jpg" alt="missing_vision_projects" title="vision" />
+          </a>
+          </span>
+
+          <span class="right">
+          <a href="projects_ai.html">
+          <img style="width:200px;height:125px;" src="assets/images/under_construction.jpg" alt="missing_ai_projects" title="ai" />
+          </a>
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+    <div id="common_footer"></div>
+  </div>
+
+  <p>&nbsp;</p>
+  <!-- javascript at the bottom for fast page loading -->
+  <script type="text/javascript" src="js/jquery.easing-sooper.js"></script>
+  <script type="text/javascript" src="js/jquery.sooperfish.js"></script>
+  <script type="text/javascript" src="js/image_fade.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('ul.sf-menu').sooperfish();
+    });
+  </script>
+
+</body>  
+
+</html>
