@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Umut Kocak</title>
+  <meta name="description" content="My personal website" />
+  <meta name="keywords" content="virtual reality, augmented reality, computer graphics, machine learning, ai" />
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script type="text/javascript" src="js/modernizr-1.5.min.js"></script>
+  <script type="text/javascript" src="js/jquery.js"></script>
+  <script type="text/javascript">
+    $(function() {
+      $("#common_header").load("common_header.html"); 
+      $("#common_footer").load("common_footer.html"); 
+      $("#common_images").load("common_images.html"); 
+      $("#common_sidebar").load("common_sidebar.html"); 
+    });
+  </script>
+</head>
+
+<body>
+
+  <div id="main">
+    <div id="common_header"></div>
+    <nav>
+      <ul class="sf-menu" id="nav">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="education.html">Education</a></li>
+        <li class="selected"><a href="publications.html">Publications</a></li>
+        <li><a href="work.html">Work</a></li>
+        <li><a href="expertise_skills.html">Expertise &amp Skills</a></li>
+        <li><a href="projects.html">Projects</a>
+          <ul>
+            <li><a href="projects_graphics.html">Graphics</a></li>
+            <li><a href="projects_vision.html">Vision</a></li>
+            <li><a href="projects_ai.html">AI</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+    
+    <div id="site_content">
+      <div id="common_images"></div>
+      <div id="common_sidebar"></div>
+
+      <div class="content">
+
+        <h2>Selected Publications</h2>
+
+        <p>
+            U. Kocak, K. L. Palmerius, and M. Cooper, “Anisotropic virtual coupling with energy-based deflection for palpating inhomogeneous compliant objects,” in <em>WorldHaptics 2013</em>, pp. 115–120, April 2013.
+        </p>
+        
+        <p>
+            U. Kocak, K. L. Palmerius, C. Forsell, and M. Cooper, “The effect of the stiffness gradient on the just noticeable difference between surface regions,” in <em>EuroHaptics 2012</em>, pp. 282–292, June 2012.
+        </p>
+        <p>
+            U. Kocak, K. L. Palmerius, and M. Cooper, “An error analysis model for adaptive deformation simulation,” in <em>Proceedings of ACHI Conference</em>, pp. 192–199, 2012.
+        </p>
+        <p>
+            U. Kocak, K. L. Palmerius, C. Forsell, A. Ynnerman, and M. Cooper, “Analysis of the jnd of stiffness in three modes of comparison,” in <em>Proceedings of HAID Conference</em>, pp. 22–31, 2011.
+        </p>
+        <p>
+            U. Kocak, K. L. Palmerius, and M. Cooper, “Dynamic deformation using adaptable, linked asynchronous fem regions,” in <em>Proceedings of the Spring Conference on Computer Graphics</em>, pp. 213–220, April 2009.
+        </p>
+        <p>
+            V. Kilic, U. Kocak, E. I. Konukseven, and E. Mumcuoglu, “Gpu supported haptic device integrated dental simulation environment,” in <em>EuroHaptics 2006</em>, pp. 135–140, July 2006.
+        </p>
+        <p>
+            E. U. Mumcuoglu, F. Nar, Y. Yardimci, U. Kocak, E. L. Ergun, B. V. Salanc, O. Ugur, and B. Erbas, “Simultaneous surface registration of ictal and interictal spect and magnetic resonance images for epilepsy studies,” <em>Nuclear Medicine Communications</em>, vol. 27, no. 1, pp. 45–55, 2006.
+        </p>
+        
+        <h2>Books</h2>
+        <p><a href="https://a.co/d/75Fdnr8">Haptic Device Integrated Dental Education Simulation: A Case Study</a></p>
+        
+      </div>
+
+    </div>
+    <div id="common_footer"></div>
+  </div>
+
+  <p>&nbsp;</p>
+  <!-- javascript at the bottom for fast page loading -->
+  <script type="text/javascript" src="js/jquery.easing-sooper.js"></script>
+  <script type="text/javascript" src="js/jquery.sooperfish.js"></script>
+  <script type="text/javascript" src="js/image_fade.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('ul.sf-menu').sooperfish();
+    });
+  </script>
+
+</body>  
+
+</html>
