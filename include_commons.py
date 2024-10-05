@@ -14,20 +14,68 @@ def process_navigation_content(content, filename):
     
     return modified_content
 
-def include_common(filename, common_file):
+
+def process_prefixes(content, path_prefix_to_root):
+    """
+    Processes the HTML content to prepend path_prefix_to_root to:
+    1. All local href links that end with .html.
+    2. All script src attributes that include paths starting with js/.
+    3. All image or other src attributes that include paths starting with assets/.
+
+    Args:
+    - content: The HTML file content as a string.
+    - path_prefix_to_root: The prefix to be prepended to all relevant paths.
+
+    Returns:
+    - The updated HTML content with modified href, script src, and image src attributes.
+    """
+
+    # Pattern to match href="XXX.html"
+    href_pattern = r'href="([^"]+\.html)"'
+
+    # Pattern to match <script src="js/XXX"></script>
+    script_pattern = r'src="(js/[^"]+\.js)"'
+
+    # Pattern to match src="assets/images/XXX"
+    assets_pattern = r'src="(assets/[^"]+)"'
+
+    # Replace href links by prepending the path_prefix_to_root
+    modified_content = re.sub(
+        href_pattern,
+        lambda match: f'href="{path_prefix_to_root}{match.group(1)}"',
+        content
+    )
+
+    # Replace script src links by prepending the path_prefix_to_root before js/
+    modified_content = re.sub(
+        script_pattern,
+        lambda match: f'src="{path_prefix_to_root}{match.group(1)}"',
+        modified_content
+    )
+
+    # Replace assets src links by prepending the path_prefix_to_root before assets/
+    modified_content = re.sub(
+        assets_pattern,
+        lambda match: f'src="{path_prefix_to_root}{match.group(1)}"',
+        modified_content
+    )
+
+    return modified_content
+
+def include_common(filepath, common_path, path_prefix_to_root):
     """
     Opens the file with the given filename, finds the <div> with an id matching
     the common file's name, and replaces only the content between the opening
     <div> and the corresponding closing </div>, keeping the surrounding tags.
     Uses a counter to handle nested divs and ensure correct matching of tags.
     """
-
+    common_file = os.path.basename(common_path)
     print(f"Including {common_file}.")
     # Extract the base name of the common file without extension (e.g., common_XXX.html -> common_XXX)
     common_id = os.path.splitext(common_file)[0]
 
     # Read the contents of the target file
-    with open(filename, 'r', encoding='utf-8') as file:
+    with open(filepath, 'r', encoding='utf-8') as file:
         file_contents = file.readlines()  # Read the file line by line
 
     # Prepare the div tag to find
@@ -43,12 +91,15 @@ def include_common(filename, common_file):
     temp_content = []
 
     # Read the contents of the common file
-    with open(common_file, 'r', encoding='utf-8') as common:
+    with open(common_path, 'r', encoding='utf-8') as common:
         common_content = common.read()
 
         # Process the content if it is common_navigation.html
         if common_file == 'common_navigation.html':
-            common_content = process_navigation_content(common_content, filename)
+            common_content = process_navigation_content(common_content, os.path.basename(filepath))
+
+        common_content = process_prefixes(common_content, path_prefix_to_root)
+
 
     for line in file_contents:
         stripped_line = line.lstrip()  # Remove leading whitespace for comparison
@@ -82,21 +133,21 @@ def include_common(filename, common_file):
         new_contents.append(line)
 
     # Write the updated content back to the original file
-    with open(filename, 'w', encoding='utf-8') as file:
+    with open(filepath, 'w', encoding='utf-8') as file:
         file.writelines(new_contents)
 
     # Print a message indicating the replacement
     if not replaced:
-        print(f"No matching <div> found for {common_file} in {filename}")
+        print(f"No matching <div> found for {common_file} in {filepath}")
 
-def include_commons(filename, common_files):
+def include_commons(file_path, common_paths, path_prefix_to_root):
     """
     Function that processes a file by including the common files.
     It loops through the common files and calls include_common for each file.
     """
-    print(f"\nIncluding commons into {filename}")
-    for common_file in common_files:
-        include_common(filename, common_file)
+    print(f"\nIncluding commons into {file_path}")
+    for common_path in common_paths:
+        include_common(file_path, common_path, path_prefix_to_root)
 
 def should_include_commons(filename):
     """
@@ -105,7 +156,7 @@ def should_include_commons(filename):
     """
     return not filename.startswith('common_')
 
-def traverse_files(common_files):
+def traverse_files_non_recursive(common_files):
     """
     Traverses all files with an html suffix in the current folder,
     checks if they should include common files, and if so, processes 
@@ -121,27 +172,60 @@ def traverse_files(common_files):
             if should_include_commons(filename):
                 include_commons(filename, common_files)
 
+def traverse_files(common_paths):
+    """
+    Recursively traverses all files with an html suffix in the current folder and its subfolders.
+    Checks if they should include common files, and if so, processes the file by including the common files.
+    """
+    current_folder = os.path.dirname(os.path.realpath(__file__))
+
+    # Traverse the folder recursively
+    for root, dirs, files in os.walk(current_folder):
+        for filename in files:
+            # Check if the file has an html suffix
+            if filename.endswith('.html'):
+                # Use the should_include_commons function to check if the file should include commons
+                if should_include_commons(filename):
+                    # Full path of the file
+                    file_path = os.path.join(root, filename)
+
+                    # Calculate the depth of the subfolder
+                    relative_path = os.path.relpath(root, current_folder)
+                    path_prefix_to_root = './'
+                    if relative_path != '.':
+                        # Create the prefix to navigate back to the starting folder
+                        depth = relative_path.count(os.sep) + 1
+                        path_prefix_to_root += '../' * depth
+
+                    # Process the file
+                    include_commons(file_path, common_paths, path_prefix_to_root)
+
 def find_common_html_files():
     """
-    Finds all files with an .html suffix that start with 'common_' 
-    in the current folder (non-recursive).
-    
-    Returns a list of such files.
+    Finds all HTML files starting with 'common_' in the 'html_commons' folder and returns their full paths.
     """
-    common_files = []
-    current_folder = os.path.dirname(os.path.realpath(__file__))
+    # Define the folder where we want to look for files
+    commons_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'html_commons')
     
-    # List all files in the current folder
-    for filename in os.listdir(current_folder):
-        # Check if the file starts with 'common_' and has an .html suffix
+    # Check if the 'html_commons' folder exists
+    if not os.path.exists(commons_folder):
+        print(f"The folder {commons_folder} does not exist.")
+        return []
+
+    # List all files in the 'html_commons' folder and collect full paths
+    common_paths = []
+    for filename in os.listdir(commons_folder):
+        # Check if the file starts with 'common_' and has an html suffix
         if filename.startswith('common_') and filename.endswith('.html'):
-            common_files.append(filename)
+            # Add the full file path to the list
+            full_path = os.path.join(commons_folder, filename)
+            common_paths.append(full_path)
     
-    return common_files
+    return common_paths
 
 if __name__ == "__main__":
     # First, find all 'common_' HTML files
-    common_files = find_common_html_files()
-    
+    common_paths = find_common_html_files()
+
     # Then, traverse and process the other HTML files, including commons where necessary
-    traverse_files(common_files)
+    traverse_files(common_paths)
