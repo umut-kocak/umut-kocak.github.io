@@ -92,12 +92,505 @@
 
       <div class="content">
 
-        <h2>Macine Learning Tips</h2>
+        <h0>Machine Learning Notes and Tips</h0>
         <hr>
-        <ul>
-          <li>A curated list of key tips to consider when training and deploying various types of machine learning models.
-          <li>A curated list of key tips to consider when training and deploying various types of machine learning models.
-        </ul>
+		<p>
+		A collection of essential tips and notes for training and deploying different machine learning models, compiled from various sources and personal experimentation.
+        </p>
+		<h2>Mixed Precision Training with Automatic Mixed Precision (<i>AMP</i>)</h2>
+		<hr>
+        <p>
+			Mixed precision training in <i>PyTorch</i> enables combining 16-bit (half-precision) and 32-bit (single-precision) floating-point operations
+			to accelerate deep learning training.
+			Modern GPUs are highly optimized for 16-bit floating-point operations, which consume less memory and improve throughput relative to 32-bit operations.
+			Using 16-bit precision for selected parts of the training therefore provides:
+			<ul>
+				<li>Enhanced Training Speed: Many GPUs, such as those Tensor Cores, process 16-bit operations more rapidly with increased throughput.</li>
+				<li>Reduced Memory Footprint: Half-precision requires half the memory of single-precision, allowing for larger batch sizes or more complex models.</li>
+				<li>Accuracy Stability: Accuracy is typically maintained, though fine-tuning may be necessary for precision-sensitive models.</li>
+			</ul>
+			<p>
+			In <i>AMP</i>, <i>PyTorch</i> automatically selects model components to run in 16-bit or 32-bit precision.
+			During the forward pass, <i>PyTorch</i> dynamically scales precision. Weights and activations are generally cast to 16-bit, while components such as batch normalization
+			layers remain in 32-bit to preserve accuracy.
+			Half-precision can result in very small gradient values, potentially causing underflow (i.e., values approaching zero beyond 16-bit representation).
+			<i>AMP</i> uses <i>dynamic loss scaling</i>, which scales up the loss before backpropagation. <i>PyTorch</i> then scales gradients back down, ensuring numerical
+			stability.
+			Gradients are computed in 16-bit or 32-bit based on operation type, with loss scaling mitigating gradient underflow. In the optimizer step, the weight updates 
+			occur in 32-bit precision, even if computations were in 16-bit, ensuring accuracy and stability over the training period.
+			</p>
+			<strong>Core Components in <i>AMP</i></strong>:
+			<ul>
+				<li><code>autocast</code>: Context manager enabling mixed precision for operations within its scope, allowing <i>PyTorch</i> to decide layer precision dynamically (16-bit or 32-bit).</li>
+				<li><code>GradScaler</code>: Dynamically adjusts the loss scaling factor to prevent gradient underflow.</li>
+			</ul>
+			<strong>Best Practices for <i>AMP</i></strong>:
+			<ul>
+				<li>Batch Normalization and Sensitive Layers: <i>PyTorch</i> manages sensitive layers internally, keeping some (e.g., BatchNorm) in 32-bit for stability.</li>
+				<li>Tuning the Scaler: For additional stability, the initial scale can be adjusted, e.g., by passing <code>GradScaler(init_scale=1024)</code>.</li>
+				<li>Monitoring: While <i>AMP</i> is generally stable, occasional manual adjustments to learning rate, scale, or other parameters may optimize performance.</li>
+			</ul>
+			Overall, <i>AMP</i> is a streamlined method to enhance model training performance. Although often emphasized for training, <i>AMP</i> can also benefit inference by improving
+			efficiency. During inference, AMP is simpler, as gradient calculations and loss scaling are not involved.
+        </p>
+		
+		
+		<h2>Quantization</h2>
+        <hr>
+		<p>
+		In <i>PyTorch</i>, quantization involves converting a model’s weights and activations from floating-point precision (e.g., float32) to lower precision (e.g., int8).
+		This process can significantly reduce model size, memory bandwidth usage, and increase inference speed due to savings in memory bandwidth and the faster computation
+		enabled by int8 arithmetic. Converting floating-point to integer values involves multiplying the floating-point value by a scale factor and rounding to
+		a whole number. These approximations can result in slightly reduced model accuracy. There are three main types of quantization:
+		
+		<h4>Static Quantization</h4>
+		Static quantization quantizes both the weights and activations of the model to lower precision (e.g., int8).
+		This requires a calibration step before inference, using a small set of data to estimate activation ranges (min/max), which
+		are then used for quantization. This process involves feeding batches of data through the network to compute distributions for
+		different activations by inserting “observer” modules at various points to record these distributions. This data helps determine
+		how activations should be quantized during inference, allowing quantized values to be passed between
+		operations instead of converting them back and forth between floats and integers, thus improving performance.
+		<p>
+		Quantization is applied during both training and inference, typically using hardware-specific optimizations for better performance.
+		This type of quantization is ideal for edge and mobile devices or environments with limited computational power where inference performance
+		is crucial, and minimal accuracy loss is acceptable.
+		</p>
+		
+		<h4>Dynamic Quantization</h4>
+		Dynamic quantization quantizes only model weights, keeping activations in floating-point but dynamically 
+		converting them to int8 based on actual values during inference. This approach does not require calibration data, making it simpler
+		to implement. The scale factor for activations is determined based on the runtime data range,
+		preserving signal fidelity across datasets. Model parameters are quantized in advance, and computation is performed using vectorized
+		INT8 instructions, with higher precision (INT16 or INT32) for accumulation to avoid overflow.
+		<p>
+		This technique is particularly suitable for models with unpredictable activation ranges. Commonly used in natural language processing
+		models, such as LSTMs, GRUs, and transformers, where lower precision weights can improve efficiency without needing activations pre-quantized.
+		</p>
+		
+		<h4>Quantization-Aware Training (<i>QAT</i>)</h4>
+		Quantization-aware training (<i>QAT</i>) often achieves the highest accuracy of these methods. Weights and activations are “fake quantized” during both forward 
+		and backward passes, rounding float values to simulate int8 values while retaining floating-point computations. This technique trains the model with awareness 
+		of its final quantized form, which typically results in higher accuracy than other quantization methods. It is often used in CNN models.
+
+        <p>
+		<table>
+			<tr>
+				<th>Feature</th>
+				<th>Static Quantization</th>
+				<th>Dynamic Quantization</th>
+			</tr>
+			<tr>
+				<td>Weights</td>
+				<td>Quantized (e.g., int8)</td>
+				<td>Quantized (e.g., int8)</td>
+			</tr>
+			<tr>
+				<td>Activations</td>
+				<td>Quantized (e.g., int8)</td>
+				<td>Remain in floating-point, dynamically quantized during inference</td>
+			</tr>
+			<tr>
+				<td>Calibration required</td>
+				<td>Yes (to determine range of activations)</td>
+				<td>No</td>
+			</tr>
+			<tr>
+				<td>Performance</td>
+				<td>Generally higher performance, lower memory usage</td>
+				<td>Slightly lower performance than static quantization</td>
+			</tr>
+			<tr>
+				<td>Use cases</td>
+				<td>CNNs, edge devices, mobile inference</td>
+				<td>NLP models (RNN, LSTM, Transformer)</td>
+			</tr>
+			<tr>
+				<td>Ease of use</td>
+				<td>Requires more effort (preparation, calibration)</td>
+				<td>Easier to apply (no calibration)</td>
+			</tr>
+		</table>
+        </p>
+		Overall, Dynamic quantization is easier to implement and suitable for models with variable activation ranges, particularly in NLP applications;
+		in LSTM/RNNs, BERT, transformers. Static quantization is optimal when calibration can be performed and when both weights and activations should
+		be quantized for maximum performance benefits. It is suitable for models which are limited by memory bandwidth for activations, CNNs.
+		Quantization-Aware Training (<i>QAT</i>) is recommended when accuracy is critical, and static quantization does not meet requirements.
+        </p>
+
+		<h2>Enable asynchronous data loading and augmentation</h2>
+        <hr>
+		<p>
+		The <code>torch.utils.data.DataLoader</code> supports asynchronous data loading and data augmentation through separate worker subprocesses. 
+		In the default configuration, <code>num_workers=0</code>, where data loading is synchronous and occurs in the main process, the main
+		training process must wait for data to become available before continuing execution.
+		Setting <code>num_workers</code> to a value greater than zero enables asynchronous data loading, allowing overlap between training and data loading.
+		The optimal value for <code>num_workers</code> depends on factors such as workload, CPU, GPU, and the location of training data.
+		The <code>DataLoader</code> also provides a <code>pin_memory</code> argument. When training on a GPU, setting <code>pin_memory=True</code> instructs
+		the <code>DataLoader</code> to use pinned memory, facilitating faster and asynchronous memory transfer from the host to the GPU.
+		</p>
+
+		<h2>Use <code>torch.device('meta')</code></h2>
+        <hr>
+		<p>
+		The <code>torch.device('meta')</code> option provides an efficient approach to conserve memory and increase flexibility when managing large models.
+		The <code>meta</code> device in <i>PyTorch</i> is specifically designed to load a model’s structure without allocating memory for its parameters. 
+		When a model is set to the <code>meta</code> device, its weights are not loaded into memory, which can be particularly beneficial for inspecting,
+		modifying, or partially loading large models without utilizing unnecessary memory resources.
+		</p>
+
+		<h2>Disable Gradient Calculation for Validation and Inference</h2>
+        <hr>
+		<p>
+		In <i>PyTorch</i>, intermediate buffers are saved for all operations involving tensors that require gradients. During validation or inference, gradients are generally
+		unnecessary. The <code>torch.no_grad()</code> context manager can be applied to disable gradient calculation within a specified code block, enhancing execution
+		speed and reducing memory requirements. <code>torch.no_grad()</code> can also be applied as a function decorator to easily disable gradient calculations for specific functions.
+		</p>
+
+		<h2>Disable Bias for Convolutions Followed by Batch Normalization</h2>
+        <hr>
+		<p>
+		The <code>torch.nn.Conv2d()</code> function includes a <code>bias</code> parameter, which defaults to <code>True</code> (the same applies
+		to <code>Conv1d</code> and <code>Conv3d</code>). When a <code>nn.Conv2d</code> layer is directly followed by a <code>nn.BatchNorm2d</code> layer,
+		the convolutional layer's bias is unnecessary. 
+		Bias becomes redundant in this scenario because the first step of Batch Normalization subtracts the mean, effectively canceling the bias effect.
+		This principle applies to 1D and 3D convolutions as long as the normalization layer normalizes the same dimension as the convolution’s bias.
+		Bias can be disabled by setting <code>bias=False</code> in <code>nn.Conv2d(..., bias=False, ...)</code>.
+		Models available through <code>torchvision</code> already implement this optimization.
+		</p>
+
+		<h2>Enable <code>channels_last</code> Memory Format for Computer Vision Models</h2>
+        <hr>
+		<p>
+		In <i>PyTorch</i>, the <code>channels_last</code> memory format optimizes the storage of multi-dimensional data (such as images) to enhance
+		performance on specific hardware, particularly on modern GPUs equipped with Tensor Cores. This format is especially useful for CNNs, which
+		frequently process 4D tensors representing images.
+		In traditional memory formats, known as <code>channels_first</code>, a 4D tensor for image data is organized in the order <code>(N, C, H, W)</code>,
+		where <code>N</code>(Batch size), <code>C</code>(Channels), <code>H</code> (Height), <code>W</code> (Width) refer to number of images
+		in a batch, number of color channels, image height and image width respectively.
+		<br>
+		With the <code>channels_last</code> format, the layout changes to <code>(N, H, W, C)</code>, grouping pixel values by spatial locations (height and width) first, with channels
+		coming last. This change offers several advantages:
+		<ul>
+			<li>Better cache utilization: By grouping pixels with channels last, GPUs can access spatial information more efficiently, leveraging the cache hierarchy. 
+			This format is particularly advantageous for convolutional operations where spatial locality is key.</li>
+			<li>Reduced memory bandwidth bottleneck: The <code>channels_last</code> format decreases cache misses and memory access inefficiencies that arise when channels are interleaved with 
+			other dimensions, as in the <code>channels_first</code> format.</li>
+			<li>Optimized for Tensor Cores: NVIDIA GPUs’ Tensor Cores are optimized for data in layouts similar to <code>channels_last</code>, enabling faster mixed-precision calculations. 
+			Utilizing <code>channels_last</code> can accelerate convolutional layers without modifying the model’s architecture or accuracy.</li>
+		</ul>
+		</p>
+
+		<h2>Avoid Unnecessary CPU-GPU Synchronization</h2>
+        <hr>
+		<p>
+		In <i>PyTorch</i>, CPU-GPU synchronization occurs when the CPU must wait for the GPU to complete its operations, which can lead to substantial slowdowns,
+		especially in deep learning training loops. This often results from forced data transfer or from calling blocking operations that require immediate
+		coordination between the CPU and GPU.
+		To maximize parallel processing and keep the accelerator's work queue full, it is advisable to avoid unnecessary synchronizations, allowing the CPU
+		to proceed independently. Certain functions and patterns should be avoided to maintain asynchronicity between CPU and GPU operations, particularly 
+		within the main training loop. These functions include:
+		<ul>
+			<li><code>gpu_tensor.item()</code></li>
+			<li><code>gpu_tensor.cpu().numpy()</code></li>
+			<li><code>gpu_tensor.to('cpu')</code></li>
+			<li><code>gpu_tensor[index]</code></li>
+			<li><code>gpu_tensor.tolist()</code></li>
+			<li><code>print(gpu_tensor)</code></li>
+			<li><code>gpu_tensor.cpu()</code></li>
+			<li><code>gpu_tensor.cuda.synchronize()</code></li>
+			<li><code>gpu_tensor.nonzero()</code></li>
+			<li>Python control flow dependent on CUDA tensor results, such as <code>if (gpu_tensor != 0).all()</code></li>
+		</ul>
+		</p>
+		
+		<h2>Operation Fusion</h2>
+        <hr>
+		<p>
+		In <i>PyTorch</i>, operation fusion is an optimization technique where multiple operations are combined into a single, more efficient operation. 
+		This reduces memory access and enhances execution speed by minimizing the creation of intermediate tensors during computation.
+		Benefits of Operation Fusion:
+		<ul>
+			<li>Memory Efficiency: Fusing multiple operations reduces the number of intermediate tensors stored in memory, thereby decreasing memory usage.</li>
+			<li>Speed Improvements: Fusion minimizes overhead from multiple function calls and memory allocations, enabling faster execution of fused operations.</li>
+			<li>Efficient Use of Hardware: Fusion benefits hardware like GPUs and TPUs, as they handle complex operations with fewer memory bottlenecks.</li>
+		</ul>
+		<p>
+		<i>PyTorch</i> also introduces a compile-mode feature using <i>TorchInductor</i>, a compiler that automatically fuses eligible kernels.
+		<i>TorchInductor</i> expands its fusion capabilities beyond simple element-wise operations, supporting pointwise and reduction operations for enhanced performance.
+		</p>
+		
+		<strong>Examples of Fused Operations:</strong>
+		<ul>
+			<li>Activation + Linear Layer: Linear layers (e.g., fully connected layers) followed by activation functions like ReLU can be fused to avoid creating 
+			intermediate outputs, resulting in faster execution of the fused layer.</li>
+			<li>Pointwise Operations: Element-wise operations (such as addition, multiplication, etc.) can be combined into a single operation, reducing memory 
+			usage and speeding up calculations. With fusion, a single kernel handles multiple pointwise operations, loading and storing data only once.</li>
+			<li>Batch Normalization + Convolution: Batch normalization applied directly after a convolutional layer is often fused into a single operation,
+			improving performance without altering computational results.
+			Fusion, in this case, is typically applied during inference only, as BatchNorm operates differently during training versus inference.
+			BatchNorm normalizes each mini-batch with its own batch statistics (mean and variance), which vary across batches during training.
+			This dynamic calculation ensures that each batch’s activations are normalized correctly during training however makes it infeasible
+			to pre-compute and fuse these parameters with the preceding layer. Fusing layers in training would also disrupt backpropagation,
+			preventing proper updates to BatchNorm parameters and potentially reducing model accuracy.
+			During inference, however, the use of fixed learned statistics (running mean and variance) accumulated during training allows the
+			normalization to be "baked into" the preceding layer, enabling a convolutional layer to produce normalized outputs directly.
+			</li>
+		</ul>
+
+		</p>
+
+		<h2><i>PyTorch</i> Compilation</h2>
+        <hr>
+		<p>
+		<i>TorchDynamo</i> is the central tool in <i>PyTorch</i>'s compilation pipeline, responsible for Just-In-Time (JIT) compiling
+		arbitrary Python code into FX graphs. It extracts FX graphs by analyzing Python bytecode during runtime and detecting calls
+		to <i>PyTorch</i> operations. It dynamically traces Python code execution, capturing an accurate and flexible representation
+		that includes control flow (if statements, loops) that older methods(<i>TorchScript</i>) couldn’t fully handle.
+
+		<p>
+		In the context of <i>PyTorch</i> compilation, the "graph" refers to an Intermediate Representation (IR) of the code. It is a Directed
+		Acyclic Graph (DAG) that describes how input tensors are transformed by operations (like add, matmul, etc.) to produce the output tensors.
+		Each node in the graph represents an operation, while each edge represents the flow of data (tensors). This graph is analogous to IR in
+		C++ compilers such as LLVM or GCC, where high-level code is translated into an intermediate form before compilation
+		into machine code.
+		</p>
+
+		Creating a graph as an intermediate step is crucial for the following reasons:
+		<ul>
+			<li>Optimization: Similar to how C++ compilers optimize IR (e.g., loop unrolling, constant folding), the graph representation allows <i>PyTorch</i> 
+			to perform deep learning-specific optimizations like operation fusion, eliminating redundant calculations, or improving memory access patterns.</li>
+			<li>Backend Flexibility: With a graph created, various backends can process it in multiple ways, such as targeting different hardware 
+			(CPU, GPU, specialized accelerators). By capturing Python code as a static graph, <i>PyTorch</i> can bypass inefficiencies in dynamic 
+			Python execution and better optimize for hardware.</li>
+		</ul>
+
+		After the graph is generated, it is sent to a backend, which translates it into lower-level code.
+		<i>TorchInductor</i>, a component of <code>torch.compile</code>, further compiles these FX graphs into optimized kernels.
+		<i>TorchDynamo</i>, however, allows the flexibility to integrate different backends. The typical backend process involves:		
+		<ul>
+			<li>Lowering: Converting the higher-level IR into a lower-level IR or directly into machine code. This often requires breaking down high-level operations
+			into smaller, more hardware-friendly instructions.</li>
+			<li>Code Generation: The backend generates machine code (or hardware-specific code, e.g., for GPU) from the graph. This is comparable to the backend 
+			step in C++ compilation (e.g., LLVM's "codegen" step), where the target architecture (CPU, GPU, etc.) is considered to produce optimized assembly or binary code.</li>
+		</ul>
+
+		Different backends employ unique strategies for lowering the graph and optimizing it based on the target hardware. Several backends have emerged
+		to handle graphs and transform them into efficient machine code:
+		<ul>
+			<li><i>TorchInductor</i>: One of the most powerful backends in <i>PyTorch</i>, focusing on generating highly optimized code for both CPU and GPU.
+			<i>TorchInductor</i> performs deep learning-specific optimizations like operation fusion and layout optimizations.</li>
+			<li><i>ONNX</i> (Open Neural Network Exchange): Though not strictly a backend like <i>TorchInductor</i>, <i>ONNX</i> serves as an intermediate
+			format for exporting models (and their computation graphs) to other frameworks or execution environments. <i>ONNX</i> Runtime acts as an 
+			execution engine for the exported graph, with its optimizations and hardware targeting. While <i>ONNX</i> is not a direct alternative
+			to <i>TorchInductor</i>, it provides a pathway focused on interoperability.</li>
+		</ul>
+		
+		In summary, <i>TorchDynamo</i> dynamically traces the model’s operations, creating a computation graph that retains Python’s flexibility
+		for control flow. The traced model is then represented as a computation graph, which is easier to optimize as it removes Python's dynamic 
+		execution constraints. The graph is passed to a backend, such as <i>TorchInductor</i> or <i>NVFuser</i>, which further optimizes and compiles
+		it into machine code. The model can now run more efficiently on the specified hardware, such as a CPU or GPU.
+		</p>
+
+		<h4><code>torch.compile</code></h4>
+		
+		The <code>torch.compile</code> API simplifies model compilation by automatically converting models into a more efficient format
+		for both training and inference. This process utilizes graph-based optimizations within <i>PyTorch</i> to improve performance.
+		When <code>torch.compile</code> is invoked, <i>TorchDynamo</i> traces the model’s Python code and converts it into a computation graph. 
+		This graph is then passed to a backend, such as <i>TorchInductor</i> or <i>NVFuser</i>, which generates optimized machine code.
+		Essentially, <code>torch.compile</code> operates as an interface to <i>TorchDynamo</i> to enable this conversion process.
+		
+		Using <code>torch.compile</code> automates the optimization process for <i>PyTorch</i> models, combining the tracing capabilities
+		of <i>TorchDynamo</i> with backend optimizations for improved runtime performance in training and inference.
+		
+		<h4><code>torch.export</code></h4>
+		
+		<p>
+		<code>torch.export</code> enables the creation of a portable, static representation of a <i>PyTorch</i> model for deployment across
+		various platforms and backends. It is designed to provide a comprehensive and efficient way to export models for deployment, even
+		those with complex, dynamic Python behaviors. It generates a graph-based intermediate representation (IR), focusing on creating a static,
+		portable IR that can function independently of Python runtime. By this, it provides model export to diverse backends, such 
+		as <i>TorchInductor</i>, <i>ONNX</i> Runtime, or custom environments.
+		</p>
+		
+		<p>
+		Similar to <i>ONNX</i>, it creates a static graph for deployment, making models portable and suitable for optimization across platforms.
+		<code>torch.export</code> is, however, primarily tailored for <i>PyTorch</i> backends (e.g., <i>TorchInductor</i>), emphasizing a
+		seamless <i>PyTorch</i> experience. 
+		<i>ONNX</i>, in contrast, is framework-agnostic, enabling model use across different machine learning environments (e.g., TensorFlow).
+		<i>ONNX</i> provides compatibility with <i>ONNX</i>-supported hardware optimizations (e.g., NVIDIA TensorRT), 
+		while <code>torch.export</code> focuses on optimized static graphs for <i>PyTorch</i>-native backends, keeping improvements <i>PyTorch</i>-centered.
+		</p>
+		
+		<p>
+		<code>torch.export</code> creates a static model for deployment in environments without Python. <i>TorchDynamo</i>, on the other hand,
+		optimizes training and inference within Python through dynamic tracing and is focused on enhancing model efficiency within
+		Python’s runtime. While <i>TorchDynamo</i> traces model execution dynamically, <code>torch.export</code> generates a fully
+		static representation, crucial for scenarios where dynamic Python execution is unavailable (e.g., mobile, edge devices, custom hardware).
+		<code>torch.export</code> is designed to handle dynamic control flows within models, converting them into a static graph suitable for
+		deployment. <i>TorchDynamo</i>, however, optimizes this behavior within Python rather than freezing it for deployment.
+		</p>
+
+		<p>
+		In summary, <code>torch.export</code> allows for a static, portable model that can be deployed after training where Python’s dynamic
+		execution isn’t viable, bridging the gap within <i>PyTorch</i> between graph-based optimization and model deployment.
+		For deployment outside <i>PyTorch</i> or where framework compatibility is needed, <i>ONNX</i> is more suitable.
+		</p>
+
+		<h4><code>torch.compile</code> vs. <code>torch.export</code></h4>
+		
+		<p>
+		While <code>torch.compile</code> and <code>torch.export</code> both serve optimization purposes within <i>PyTorch</i>, they 
+		address different stages and needs in the workflow.
+		</p>
+
+	    <p>
+		torch.compile optimizes model execution during training or inference for enhanced performance on various hardware backends. It
+		targets runtime optimization, accelerating model performance within a Python environment without additional user adjustments. 
+		Primarily used for performance gains within Python’s runtime, relying on <i>PyTorch</i>’s backends for optimized code execution.
+		Uses <i>TorchDynamo</i> to trace models, and passes the graph to backends like <i>TorchInductor</i> or <i>NVFuser</i> for machine
+		code generation.
+		</p>
+
+		<p>
+		<code>torch.export</code>, on the other hand, produces a static, portable model representation suitable for deployment beyond
+		Python-based environments, such as embedded systems or mobile devices. It focuses on creating a portable model representation independent
+		of Python, making it ideal for deployment in diverse environments. Freezes the model’s dynamic behaviors and generates a graph that
+		can execute without Python, useful for deployment in edge or custom hardware settings. After export, the static graph can be processed
+		by various backends, including <i>TorchInductor</i> or <i>ONNX</i> Runtime, ensuring compatibility with different deployment environments.
+		</p>
+		
+		<p>
+		They also differ in terms of theis execution policies; dynamic vs. static. <code>torch.compile</code> operates within Python’s dynamic
+		runtime, using tracing for in-the-moment optimization and retaining dynamic execution capabilities, while <code>torch.export</code>
+		simplifies the model into a static representation for deployment.
+		</p>
+		
+		<p>
+		<table>
+			<tr>
+				<th>Feature</th>
+				<th>torch.compile</th>
+				<th>torch.export</th>
+			</tr>
+			<tr>
+				<td><strong>Purpose</strong></td>
+				<td>Runtime optimization for <i>PyTorch</i> models in Python</td>
+				<td>Export a static, portable model for deployment outside Python</td>
+			</tr>
+			<tr>
+				<td><strong>Dynamic/Static</strong></td>
+				<td>Works with dynamic models in Python</td>
+				<td>Freezes models into a static graph</td>
+			</tr>
+			<tr>
+				<td><strong>Use Case</strong></td>
+				<td>Optimizing training/inference in Python environments</td>
+				<td>Deployment on non-Python platforms (e.g., edge devices, embedded systems)</td>
+			</tr>
+			<tr>
+				<td><strong>Backends</strong></td>
+				<td><i>TorchInductor</i>, <i>NVFuser</i> (for performance)</td>
+				<td><i>TorchInductor</i>, <i>ONNX</i> Runtime, or custom deployment backends (for portability)</td>
+			</tr>
+			<tr>
+				<td><strong>Relation to <i>ONNX</i></strong></td>
+				<td>Not directly related</td>
+				<td>Comparable, but <i>ONNX</i> is framework-agnostic while <code>torch.export</code> is <i>PyTorch</i>-centric</td>
+			</tr>
+		</table>
+		<p>
+
+		<p>
+		<code>torch.export</code>, therefore, provides additional functionality beyond <code>torch.compile</code> as it creates
+		a fully portable, static model representation, suitable for deployment in environments that do not support Python.
+		</p>
+
+		<h2>ONNX</h2>
+        <hr>
+		<p>
+		<p>
+		Using <i>TorchDynamo</i> with a backend like <i>TorchInductor</i> can often handle training, compiling, and deploying a model.
+		For compilation, <i>TorchDynamo</i> dynamically traces and compiles the model’s forward and backward passes into a computation graph. And then
+	    a backend (e.g., <i>TorchInductor</i>) converts this graph into optimized code for the target hardware (CPU or GPU), potentially accelerating training.
+		</p>
+		After training, efficient model deployment typically involves creation of computation graph from the trained model, via <i>TorchDynamo</i>. 
+		Followed by a backend (e.g., <i>TorchInductor</i>, <i>NVFuser</i>) optimizing the graph and generating fast machine code, improving inference
+		performance through operation fusion, memory access optimization, and direct CPU/GPU execution.
+		<i>ONNX</i> is especially helpful if deployment needs extend beyond <i>PyTorch</i>-supported environments:
+		<ul>
+			<li>Cross-Platform Flexibility: <i>ONNX</i> enables deployment on platforms not natively supporting <i>PyTorch</i>, such as mobile, IoT, web, or cloud environments.
+			Exporting to <i>ONNX</i> allows compatibility with <i>ONNX</i> Runtime, TensorRT, and other frameworks like <i>OpenVINO</i>.</li>
+			<li>Hardware-Specific Optimization: While <i>PyTorch</i> optimizes for CPUs and GPUs, <i>ONNX</i> supports broader hardware options, including custom chips 
+			(e.g., NVIDIA TensorRT, Qualcomm Hexagon DSPs), mobile ARM devices, and cloud hardware (e.g., AWS Inferentia, Azure ML).</li>
+			<li>Extended Ecosystem: <i>ONNX</i> provides access to additional tools for optimization, quantization, and multi-platform compatibility, enhancing deployment possibilities.</li>
+		</ul>
+		In summary, while TorchDynamo and <i>TorchInductor</i> suffice for <i>PyTorch</i>-supported systems, <i>ONNX</i> provides greater flexibility for broader deployment needs, 
+		especially when targeting non-<i>PyTorch</i> platforms or specialized hardware.
+		</p>
+
+
+		<h2><i>PyTorch</i> Edge and <i>ExecuTorch</i></h2>
+        <hr>
+		<p>
+
+		<h4><i>PyTorch</i> Edge</h4>
+		<p>
+		<i>PyTorch</i> Edge is a specialized platform within the <i>PyTorch</i> ecosystem, developed for deploying machine learning models on edge devices
+		such as smartphones, tablets, and IoT hardware. These devices are typically resource-constrained and lack the computational
+		capacity of larger systems, yet require efficient inference capabilities.
+		</p>
+
+		<p>
+		It enables deployment on mobile and edge platforms through a streamlined version of <i>PyTorch</i>, optimized for inference rather than training. 
+		Models trained in <i>PyTorch</i> can be deployed with minimal resource requirements, benefiting from specific optimizations for mobile scenarios, such as quantization.
+		This approach reduces model size and memory usage while preserving performance, essential for devices with limited RAM and storage.
+		It also offers libraries for Android and iOS, enabling seamless integration of <i>PyTorch</i> models within native mobile applications
+		through <i>PyTorch Mobile</i>.
+		</p>
+		
+		<p>
+		In essence, <i>PyTorch</i> Edge is an optimized, lightweight version of <i>PyTorch</i> designed specifically for model inference on
+		mobile and edge devices, while <i>TorchDynamo</i> and <i>TorchInductor</i> are geared toward high-performance server and desktop
+		environments. Although models can also be converted to <i>ONNX</i> for deployment on edge devices, <i>PyTorch</i> Edge provides a
+		more integrated solution within the <i>PyTorch</i> ecosystem, making it preferable for <i>PyTorch</i>-centric mobile workflows.
+		</p>
+		
+		<h4>ExecuTorch</h4>
+
+		<p>
+		<i>ExecuTorch</i> serves as an ultra-lightweight execution engine within <i>PyTorch</i>, targeted at highly constrained environments where
+		even <i>PyTorch</i> Edge may be too large. It is suitable for scenarios involving minimalistic, resource-limited devices that require
+		efficient inference but cannot support the full <i>PyTorch</i> Mobile runtime.
+		</p>
+
+		<p>
+		It provides an ultra-compact inference engine by supporting only a core subset of <i>PyTorch</i> functionalities. With also a
+		lower resource footprint, it is ideal for highly constrained devices such as IoT sensors and embedded systems.
+		Binary size and resource usage is also minimized with its minimal dependencies.
+		</p>
+		
+		<p>
+		Unlike <i>TorchDynamo</i> and <i>TorchInductor</i>, which are tailored for larger systems, <i>ExecuTorch</i> focuses exclusively on lightweight inference.
+		Although <i>ONNX</i> provides a means of lightweight deployment with <i>ONNX</i> Runtime, <i>ExecuTorch</i> offers a 
+		native <i>PyTorch</i> runtime specifically optimized for environments with stringent resource constraints.
+		</p>
+		
+		<h4>Summary of Related Tools in the <i>PyTorch</i> Workflow</h4>
+		<ul>
+			<li><i>TorchDynamo</i>: Converts <i>PyTorch</i> code into a computation graph, facilitating model compilation during
+			training and inference on high-performance hardware. Together with <i>TorchInductor</i>, best suited for training and
+			high-performance inference on server-grade hardware such as cloud infrastructure or workstations</li>
+			<li><i>TorchInductor</i>: Optimizes the computation graph from <i>TorchDynamo</i> and generates machine code for
+			CPU and GPU environments, ideal for traditional deployment on servers or desktops.</li>
+			<li><i>ONNX</i>: Provides cross-platform model export capabilities, enabling <i>PyTorch</i> models to run on other runtimes and hardware accelerators such as NVIDIA TensorRT or mobile inference engines.</li>
+			<li><i>PyTorch Edge</i>: A deployment-focused runtime for mobile and edge devices, utilizing <i>PyTorch</i> Mobile to optimize inference on constrained, yet reasonably powerful, platforms.</li>
+			<li><i>ExecuTorch</i>: An ultra-light runtime for the most resource-limited deployments, ideal for microcontrollers or embedded systems with minimal memory and processing capacity.</li>
+		</ul>
+
+		</p>
+
+
+
       </div>
 
     </div>

@@ -40,7 +40,7 @@ img {
 }
 
 /* Headings */
-h1, h2, h3, h4, h5 {
+h0, h1, h2, h3, h4, h5, h6, h7 {
   color: #FFF;
   letter-spacing: 0em;
   padding: 0 0 5px 0;
@@ -49,18 +49,22 @@ h1, h2, h3, h4, h5 {
 }
 
 h2 { 
-  font-size: 160%;
-}
-
-h3, h4 {
   font-size: 140%;
 }
 
-h2, h4 {
+h3, h4 {
+  font-size: 120%;
+}
+
+h5, h6 {
+  font-size: 100%;
+}
+
+h0, h2, h4, h6 {
   color: #FF2F00;
 }
 
-h5 { 
+h7 { 
   font: italic 95% arial, sans-serif;
 }
 
@@ -188,7 +192,7 @@ nav {
   margin: 0 0 17px 0;
 }
   
-.sidebar h3, .content h1 { 
+.sidebar h3, .content h0, h1 { 
   padding: 0 15px 20px 0;
   font: 240% 'News Cycle', arial, sans-serif;
   text-shadow:  #000 1px 1px;
@@ -208,7 +212,7 @@ nav {
   font-size: 120%;
 }
 
-.content h2 {
+.content h0, h2 {
   font-weight: bold;
 }
   
@@ -468,4 +472,13 @@ ul#images li {
   margin: 10px 0;
   font-size: 0.9em;
   color: rgba(255, 255, 255, 0.3); /* Semi-transparent white text */
+}
+
+table, th, td {
+  border: 1px solid white; /* Adds borders around cells */
+  border-collapse: collapse; /* Ensures there is no spacing between cell borders */
+}
+th, td {
+  padding: 8px; /* Adds padding for readability */
+  text-align: left; /* Optional: aligns text to the left */
 }
