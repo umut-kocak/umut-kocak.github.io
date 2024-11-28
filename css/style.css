@@ -482,3 +482,19 @@ th, td {
   padding: 8px; /* Adds padding for readability */
   text-align: left; /* Optional: aligns text to the left */
 }
+
+.imagetextcontainer {
+    overflow: hidden; /* Ensures the container encloses floated elements */
+}
+
+.image {
+    float: left; /* Float the image to the left so text wraps around it */
+    margin-right: 8px; /* Add space between the image and the text */
+    margin-bottom: 8px; /* Add space below the image */
+}
+
+.image img {
+    display: block; /* Ensures proper block behavior for the image */
+    max-width: 100%; /* Scale image width dynamically */
+    height: auto; /* Maintain aspect ratio */
+}
